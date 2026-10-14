@@ -6,6 +6,10 @@ license = "MIT OR Apache-2.0"
 repository = "https://github.com/mir-protocol/plonky2"
 edition = "2021"
 
+[features]
+gpu = ["plonky2/gpu"]
+gpu-profiling = ["gpu", "plonky2/gpu-profiling"]
+
 [dependencies]
 anyhow = { version = "1.0.40", default-features = false }
 itertools = { version = "0.10.0", default-features = false }
