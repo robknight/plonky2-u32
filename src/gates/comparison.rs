@@ -436,7 +436,6 @@ impl<F: RichField + Extendable<D>, const D: usize> SimpleGenerator<F, D>
         ]
     }
 
-    #[cfg(feature = "gpu")]
     fn gpu_operation(&self) -> Option<plonky2::iop::generator::GpuWitnessOperation> {
         use plonky2::iop::generator::GpuWitnessOperation;
         if D != 2 || !GpuWitnessOperation::field_supported::<F>() {
