@@ -436,9 +436,9 @@ impl<F: RichField + Extendable<D>, const D: usize> SimpleGenerator<F, D>
         ]
     }
 
-    fn gpu_operation(&self) -> Option<plonky2::iop::generator::GpuWitnessOperation> {
-        use plonky2::iop::generator::GpuWitnessOperation;
-        if D != 2 || !GpuWitnessOperation::field_supported::<F>() {
+    fn witness_operation(&self) -> Option<plonky2::iop::generator::WitnessOperation> {
+        use plonky2::iop::generator::WitnessOperation;
+        if D != 2 || !WitnessOperation::field_supported::<F>() {
             return None;
         }
         let wire = |column| Target::wire(self.row, column);
@@ -464,7 +464,7 @@ impl<F: RichField + Extendable<D>, const D: usize> SimpleGenerator<F, D>
         for i in 0..=self.gate.chunk_bits() {
             outputs.push(wire(self.gate.wire_most_significant_diff_bit(i)));
         }
-        Some(GpuWitnessOperation::Comparison {
+        Some(WitnessOperation::Comparison {
             inputs: [
                 wire(self.gate.wire_first_input()),
                 wire(self.gate.wire_second_input()),
