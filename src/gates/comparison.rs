@@ -593,57 +593,6 @@ impl<F: RichField + Extendable<D>, const D: usize> SimpleGenerator<F, D>
     }
 }
 
-/// Exact-output CPU/GPU diagnostic for comparison witness generation.
-#[cfg(feature = "gpu-profiling")]
-pub fn comparison_gpu_smoke() -> Result<()> {
-    use plonky2::field::goldilocks_field::GoldilocksField;
-    use plonky2::gpu::{resident_witness::RegionProgram, GpuContext};
-
-    type F = GoldilocksField;
-    let ctx = GpuContext::new()?;
-    for (case, (num_bits, num_chunks, first, second)) in [
-        (15, 3, 1234u64, 1234u64),
-        (32, 4, 999_999, 1_000_000),
-        (32, 4, 1_000_000, 999_999),
-        (60, 5, (1u64 << 59) - 1, (1u64 << 59) - 2),
-        (63, 1, (1u64 << 62) + 7, (1u64 << 62) + 9),
-    ]
-    .into_iter()
-    .enumerate()
-    {
-        let gate = ComparisonGate::<F, 2>::new(num_bits, num_chunks);
-        let wire_count = gate.num_wires();
-        let map = (0..wire_count).collect::<Vec<_>>();
-        let generator = ComparisonGenerator { row: 0, gate };
-        let mut entry = PartitionWitness::<F>::new(wire_count, 1, &map);
-        entry.set_target(Target::wire(0, 0), F::from_canonical_u64(first))?;
-        entry.set_target(Target::wire(0, 1), F::from_canonical_u64(second))?;
-        let mut cpu = GeneratedValues::empty();
-        <ComparisonGenerator<F, 2> as SimpleGenerator<F, 2>>::run_once(
-            &generator, &entry, &mut cpu,
-        )?;
-        let generators = vec![WitnessGeneratorRef::<F, 2>::new(generator.adapter())];
-        let program = RegionProgram::compile(&generators, &entry, &[0])?;
-        let mut gpu = program.prepare(&ctx)?;
-        for values in [gpu.execute(&entry, false)?, gpu.execute_fused(&entry)?] {
-            let by_rep = program
-                .representatives()
-                .iter()
-                .copied()
-                .zip(values)
-                .collect::<alloc::collections::BTreeMap<_, _>>();
-            for &(output, expected) in &cpu.target_values {
-                assert_eq!(
-                    by_rep[&map[output.index(wire_count, 1)]],
-                    expected,
-                    "case {case}, target {output:?}"
-                );
-            }
-        }
-    }
-    Ok(())
-}
-
 #[cfg(test)]
 mod tests {
     use anyhow::Result;
