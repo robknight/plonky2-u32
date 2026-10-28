@@ -196,6 +196,23 @@ impl<F: RichField + Extendable<D>, const D: usize> SimpleGenerator<F, D>
             .collect()
     }
 
+    fn witness_operation(&self) -> Option<plonky2::iop::generator::WitnessOperation> {
+        use plonky2::iop::generator::WitnessOperation;
+        if !WitnessOperation::field_supported::<F>() {
+            return None;
+        }
+        Some(WitnessOperation::U32RangeCheck {
+            inputs: self.dependencies(),
+            outputs: (0..self.gate.num_input_limbs)
+                .flat_map(|i| {
+                    (0..16).map(move |j| {
+                        Target::wire(self.row, self.gate.wire_ith_input_limb_jth_aux_limb(i, j))
+                    })
+                })
+                .collect(),
+        })
+    }
+
     fn run_once(
         &self,
         witness: &PartitionWitness<F>,

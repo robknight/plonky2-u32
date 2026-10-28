@@ -299,6 +299,28 @@ impl<F: RichField + Extendable<D>, const D: usize> SimpleGenerator<F, D>
         ]
     }
 
+    fn witness_operation(&self) -> Option<plonky2::iop::generator::WitnessOperation> {
+        use plonky2::iop::generator::WitnessOperation;
+        if !WitnessOperation::field_supported::<F>() {
+            return None;
+        }
+        let wire = |column| Target::wire(self.row, column);
+        Some(WitnessOperation::U32Subtraction {
+            inputs: [
+                wire(self.gate.wire_ith_input_x(self.i)),
+                wire(self.gate.wire_ith_input_y(self.i)),
+                wire(self.gate.wire_ith_input_borrow(self.i)),
+            ],
+            outputs: core::array::from_fn(|j| {
+                wire(match j {
+                    0 => self.gate.wire_ith_output_result(self.i),
+                    1 => self.gate.wire_ith_output_borrow(self.i),
+                    _ => self.gate.wire_ith_output_jth_limb(self.i, j - 2),
+                })
+            }),
+        })
+    }
+
     fn run_once(
         &self,
         witness: &PartitionWitness<F>,
