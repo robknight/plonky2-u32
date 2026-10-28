@@ -13,6 +13,7 @@ gpu-profiling = ["gpu", "plonky2/gpu-profiling"]
 [dependencies]
 anyhow = { version = "1.0.40", default-features = false }
 itertools = { version = "0.10.0", default-features = false }
+log = { version = "0.4", default-features = false }
 num = { version = "0.4", default-features = false }
 plonky2 = { git = "https://github.com/robknight/plonky2", rev = "85a5624e8fe4e0315fa01b8b8af78a93fc17ebe1" }
 

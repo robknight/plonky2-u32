@@ -115,6 +115,18 @@ fn u32_executor_serialization_strict_proofs_and_conflicting_outputs() -> Result<
         "this GPU integration test requires an adapter"
     );
     let f = fixture();
+    let gate_serializer = plonky2_u32::serialization::U32GateSerializer;
+    let generator_serializer =
+        plonky2_u32::serialization::U32GeneratorSerializer::<C, 2>::default();
+    let circuit_bytes = f
+        .data
+        .to_bytes(&gate_serializer, &generator_serializer)
+        .expect("serialize u32 circuit");
+    let f = Fixture {
+        data: CircuitData::from_bytes(&circuit_bytes, &gate_serializer, &generator_serializer)
+            .expect("load u32 circuit"),
+        inputs: f.inputs,
+    };
     let seed = witness(&f, &[0; 21])?;
     let program = f.data.compile_witness_program_like(&seed)?;
     let encoded = program.to_bytes();

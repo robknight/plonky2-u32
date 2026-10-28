@@ -1,3 +1,6 @@
+// Compatibility with adapters using the CSP u32 serializer names.
+pub use crate::serialization::{U32GateSerializer, U32GeneratorSerializer};
+
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::{format, vec};
@@ -26,7 +29,7 @@ use plonky2::plonk::vars::{
 };
 
 /// A gate to perform a basic mul-add on 32-bit values (we assume they are range-checked beforehand).
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, Default)]
 pub struct U32ArithmeticGate<F: RichField + Extendable<D>, const D: usize> {
     pub num_ops: usize,
     _phantom: PhantomData<F>,
@@ -352,8 +355,8 @@ impl<F: RichField + Extendable<D>, const D: usize> PackedEvaluableBase<F, D>
     }
 }
 
-#[derive(Clone, Debug)]
-struct U32ArithmeticGenerator<F: RichField + Extendable<D>, const D: usize> {
+#[derive(Clone, Debug, Default)]
+pub(crate) struct U32ArithmeticGenerator<F: RichField + Extendable<D>, const D: usize> {
     gate: U32ArithmeticGate<F, D>,
     row: usize,
     i: usize,

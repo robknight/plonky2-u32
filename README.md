@@ -12,6 +12,14 @@ checks boundary and fresh inputs, and verifies proofs after program loading.
 When testing local executor changes, override the pinned Plonky2 Git dependency
 with a Cargo patch to the matching local checkout.
 
+## Circuit serialization
+
+`serialization::{U32GateSerializer, U32GeneratorSerializer}` serialize the default
+Plonky2 gates/generators together with u32 arithmetic, addition, subtraction,
+range-check and comparison gates/generators. Store compiled witness programs
+separately; Plonky2's circuit serialization omits them. Serializer types are also
+re-exported from `gates::arithmetic_u32` for existing CSP adapters.
+
 ## License
 
 Licensed under either of
