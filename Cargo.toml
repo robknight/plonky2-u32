@@ -15,7 +15,7 @@ anyhow = { version = "1.0.40", default-features = false }
 itertools = { version = "0.10.0", default-features = false }
 log = { version = "0.4", default-features = false }
 num = { version = "0.4", default-features = false }
-plonky2 = { git = "https://github.com/robknight/plonky2", rev = "85a5624e8fe4e0315fa01b8b8af78a93fc17ebe1" }
+plonky2 = { git = "https://github.com/robknight/plonky2", rev = "52ab658ec2f5f0eeb6e7a3e0511b6525813534ac" }
 
 [dev-dependencies]
 rand = { version = "0.8.4", default-features = false, features = ["getrandom"] }
